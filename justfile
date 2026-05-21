@@ -8,4 +8,7 @@ run:
     go run {{ entryPoint }}
 
 build:
-    go build {{ entryPoint }}
+    go build -o "gsw" {{ entryPoint }}
+
+clean:
+    rm -rv "gsw"
