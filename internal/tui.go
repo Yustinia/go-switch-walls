@@ -10,6 +10,13 @@ import (
 
 const pageSize int = 20
 
+type state int
+
+const (
+	leftFoc state = iota
+	rightFoc
+)
+
 var matugenSchemes = []string{
 	"scheme-content", "scheme-expressive", "scheme-fidelity", "scheme-fruit-salad", "scheme-monochrome", "scheme-neutral", "scheme-rainbow", "scheme-tonal-spot", "scheme-vibrant",
 }
@@ -19,6 +26,7 @@ type model struct {
 	curPage      int
 	wallCursor   int
 	schemeCursor int
+	curState     state
 }
 
 func (m model) currentPage() []string {
@@ -49,13 +57,25 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "up", "k":
-			if m.wallCursor > 0 {
-				m.wallCursor--
+			if m.curState == leftFoc {
+				if m.wallCursor > 0 {
+					m.wallCursor--
+				}
+			} else if m.curState == rightFoc {
+				if m.schemeCursor > 0 {
+					m.schemeCursor--
+				}
 			}
 
 		case "down", "j":
-			if m.wallCursor < len(page)-1 {
-				m.wallCursor++
+			if m.curState == leftFoc {
+				if m.wallCursor < len(page)-1 {
+					m.wallCursor++
+				}
+			} else if m.curState == rightFoc {
+				if m.schemeCursor < len(matugenSchemes)-1 {
+					m.schemeCursor++
+				}
 			}
 
 		case "left", "h":
@@ -77,6 +97,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				fmt.Println(err)
 			}
+
+		case "s":
+			m.curState = (m.curState + 1) % 2
 		}
 	}
 
