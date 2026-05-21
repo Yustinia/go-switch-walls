@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 const pageSize int = 20
@@ -76,10 +77,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+type Styles struct {
+	Left  lipgloss.Style
+	Right lipgloss.Style
+}
+
+func makeStyle() Styles {
+	return Styles{
+		Left:  lipgloss.NewStyle().Width(80),
+		Right: lipgloss.NewStyle().Width(100),
+	}
+}
+
 func (m model) View() tea.View {
+	styles := makeStyle()
+
 	page := m.currentPage()
 
-	s := ""
+	curPageWall := ""
 
 	for index, wall := range page {
 		cursor := " "
@@ -87,7 +102,12 @@ func (m model) View() tea.View {
 			cursor = ">"
 		}
 
-		s += fmt.Sprintf("%s %s\n", cursor, wall)
+		curPageWall += fmt.Sprintf("%s %s\n", cursor, wall)
 	}
-	return tea.NewView(s)
+
+	leftCol := styles.Left.Render(curPageWall)
+	rightCol := styles.Right.Render("Placeholder")
+
+	render := lipgloss.JoinHorizontal(lipgloss.Left, leftCol, rightCol)
+	return tea.NewView(render)
 }
