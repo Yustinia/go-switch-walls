@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"strings"
 
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
@@ -90,10 +91,9 @@ func makeStyle() Styles {
 }
 
 func (m model) View() tea.View {
+	var b strings.Builder
 	styles := makeStyle()
-
 	page := m.currentPage()
-
 	curPageWall := ""
 
 	for index, wall := range page {
@@ -102,8 +102,10 @@ func (m model) View() tea.View {
 			cursor = ">"
 		}
 
-		curPageWall += fmt.Sprintf("%s %s\n", cursor, wall)
+		fmt.Fprintf(&b, "%s %s\n", cursor, wall)
 	}
+
+	curPageWall = b.String()
 
 	leftCol := styles.Left.Render(curPageWall)
 	rightCol := styles.Right.Render("Placeholder")
