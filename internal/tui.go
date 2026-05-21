@@ -10,10 +10,15 @@ import (
 
 const pageSize int = 20
 
+var matugenSchemes = []string{
+	"scheme-content", "scheme-expressive", "scheme-fidelity", "scheme-fruit-salad", "scheme-monochrome", "scheme-neutral", "scheme-rainbow", "scheme-tonal-spot", "scheme-vibrant",
+}
+
 type model struct {
-	walls   []string
-	curPage int
-	cursor  int
+	walls        []string
+	curPage      int
+	wallCursor   int
+	schemeCursor int
 }
 
 func (m model) currentPage() []string {
@@ -44,29 +49,29 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
+			if m.wallCursor > 0 {
+				m.wallCursor--
 			}
 
 		case "down", "j":
-			if m.cursor < len(page)-1 {
-				m.cursor++
+			if m.wallCursor < len(page)-1 {
+				m.wallCursor++
 			}
 
 		case "left", "h":
 			if m.curPage > 0 {
-				m.cursor = 0
+				m.wallCursor = 0
 				m.curPage--
 			}
 
 		case "right", "l":
 			if m.curPage < validPages-1 {
-				m.cursor = 0
+				m.wallCursor = 0
 				m.curPage++
 			}
 
 		case "enter":
-			selected := m.currentPage()[m.cursor]
+			selected := m.currentPage()[m.wallCursor]
 			err = applyWallpaper(selected)
 
 			if err != nil {
@@ -94,21 +99,31 @@ func (m model) View() tea.View {
 	var b strings.Builder
 	styles := makeStyle()
 	page := m.currentPage()
-	curPageWall := ""
 
 	for index, wall := range page {
 		cursor := " "
-		if m.cursor == index {
+		if m.wallCursor == index {
 			cursor = ">"
 		}
 
 		fmt.Fprintf(&b, "%s %s\n", cursor, wall)
 	}
+	curPageWall := b.String()
+	b.Reset()
 
-	curPageWall = b.String()
+	for index, scheme := range matugenSchemes {
+		cursor := " "
+		if m.schemeCursor == index {
+			cursor = ">"
+		}
+
+		fmt.Fprintf(&b, "%s %s\n", cursor, scheme)
+	}
+	schemeSel := b.String()
+	b.Reset()
 
 	leftCol := styles.Left.Render(curPageWall)
-	rightCol := styles.Right.Render("Placeholder")
+	rightCol := styles.Right.Render(schemeSel)
 
 	render := lipgloss.JoinHorizontal(lipgloss.Left, leftCol, rightCol)
 	return tea.NewView(render)
