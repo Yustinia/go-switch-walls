@@ -91,8 +91,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "enter":
-			selected := m.currentPage()[m.wallCursor]
-			err = applyWallpaper(selected)
+			selWall := m.currentPage()[m.wallCursor]
+			selScheme := matugenSchemes[m.schemeCursor]
+			err = applyWallpaper(selWall, selScheme)
 
 			if err != nil {
 				fmt.Println(err)
