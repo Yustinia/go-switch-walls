@@ -38,14 +38,20 @@ func allocateList() model {
 	return model{walls: wallList}
 }
 
+func (m model) currentPage() []string {
+	start := m.page * pageSize
+	end := min(start+pageSize, len(m.walls))
+	page := m.walls[start:end]
+
+	return page
+}
+
 func (m model) Init() tea.Cmd {
 	return nil
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	start := m.page * pageSize
-	end := min(start+pageSize, len(m.walls))
-	page := m.walls[start:end]
+	page := m.currentPage()
 
 	validPages := len(m.walls) / pageSize
 	if len(m.walls)%pageSize != 0 {
@@ -82,10 +88,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() tea.View {
+	page := m.currentPage()
+
 	s := ""
-	start := m.page * pageSize
-	end := min(start+pageSize, len(m.walls))
-	page := m.walls[start:end]
 
 	for index, wall := range page {
 		cursor := " "
