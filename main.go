@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	tea "charm.land/bubbletea/v2"
@@ -11,9 +12,34 @@ import (
 const pageSize int = 20
 
 type model struct {
-	walls  []string
-	page   int
-	cursor int
+	walls   []string
+	curPage int
+	cursor  int
+}
+
+func applyWallpaper(wall string) error {
+	matugenFlags := []string{
+		"image", wall, "-t", "scheme-expressive", "-m", "dark", "--contrast", "0.1", "--source-color-index", "0",
+	}
+	awwwFlags := []string{
+		"img", wall, "--transition-type", "simple", "--transition-step", "2", "--transition-fps", "60",
+	}
+
+	cmd := exec.Command("matugen", matugenFlags...)
+
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("matugen failed: %w", err)
+	}
+
+	cmd = exec.Command("awww", awwwFlags...)
+
+	err = cmd.Run()
+	if err != nil {
+		return fmt.Errorf("awww failed: %w", err)
+	}
+
+	return nil
 }
 
 func allocateList() model {
@@ -39,7 +65,7 @@ func allocateList() model {
 }
 
 func (m model) currentPage() []string {
-	start := m.page * pageSize
+	start := m.curPage * pageSize
 	end := min(start+pageSize, len(m.walls))
 	page := m.walls[start:end]
 
@@ -51,6 +77,7 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var err error
 	page := m.currentPage()
 
 	validPages := len(m.walls) / pageSize
@@ -63,23 +90,35 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
+
 		case "up", "k":
 			if m.cursor > 0 {
 				m.cursor--
 			}
+
 		case "down", "j":
 			if m.cursor < len(page)-1 {
 				m.cursor++
 			}
+
 		case "left", "h":
-			if m.page > 0 {
+			if m.curPage > 0 {
 				m.cursor = 0
-				m.page--
+				m.curPage--
 			}
+
 		case "right", "l":
-			if m.page < validPages-1 {
+			if m.curPage < validPages-1 {
 				m.cursor = 0
-				m.page++
+				m.curPage++
+			}
+
+		case "enter":
+			selected := m.currentPage()[m.cursor]
+			err = applyWallpaper(selected)
+
+			if err != nil {
+				fmt.Println(err)
 			}
 		}
 	}
