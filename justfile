@@ -1,9 +1,11 @@
+entryPoint := "./cmd"
+
 # list recipes
 default:
     just --list
 
 run:
-    go run .
+    go run {{ entryPoint }}
 
 build:
-    go build .
+    go build {{ entryPoint }}
