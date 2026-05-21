@@ -98,7 +98,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Println(err)
 			}
 
-		case "s":
+		case "tab":
 			m.curState = (m.curState + 1) % 2
 		}
 	}
