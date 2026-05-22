@@ -1,5 +1,5 @@
 entryPoint := "./cmd"
-exeName := "gsw"
+exeName := "wally"
 
 # list recipes
 default:

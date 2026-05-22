@@ -26,14 +26,14 @@ This builds the binary and moves it to `~/.local/bin` automatically.
 **Manually:**
 
 ```sh
-go build .
-mv gsw ~/.local/bin/
+go build -o wally ./cmd
+mv wally ~/.local/sbin/
 ```
 
 ## Usage
 
 ```sh
-gsw
+wally
 ```
 
 ## Keybindings
