@@ -134,15 +134,18 @@ type Styles struct {
 	RightBotRow lipgloss.Style
 }
 
-func makeStyle(totalWidth int) Styles {
+func makeStyle(totalWidth int, totalHeight int) Styles {
 	leftWidth := 80
 	rightWidth := totalWidth - leftWidth
 
+	rightBotRowHeight := 4
+	rightTopRowHeight := totalHeight - rightBotRowHeight
+
 	return Styles{
-		Left:        lipgloss.NewStyle().Width(leftWidth).Border(lipgloss.RoundedBorder()),
+		Left:        lipgloss.NewStyle().Width(leftWidth).Height(totalHeight).Border(lipgloss.RoundedBorder()).AlignVertical(lipgloss.Center),
 		Right:       lipgloss.NewStyle().Width(rightWidth),
-		RightTopRow: lipgloss.NewStyle().Width(rightWidth).Border(lipgloss.RoundedBorder()),
-		RightBotRow: lipgloss.NewStyle().Width(rightWidth).Border(lipgloss.RoundedBorder()),
+		RightTopRow: lipgloss.NewStyle().Width(rightWidth).Height(rightTopRowHeight).Border(lipgloss.RoundedBorder()).AlignVertical(lipgloss.Center),
+		RightBotRow: lipgloss.NewStyle().Width(rightWidth).Height(rightBotRowHeight).Border(lipgloss.RoundedBorder()).AlignHorizontal(lipgloss.Center).AlignVertical(lipgloss.Center),
 	}
 }
 
@@ -191,7 +194,7 @@ func viewColorMode(colorStr string) string {
 }
 
 func (m model) View() tea.View {
-	styles := makeStyle(m.width)
+	styles := makeStyle(m.width, m.height)
 	wallList := m.makeWallList()
 	schemeList := m.makeSchemeList()
 	colorState := m.setColorMode()
