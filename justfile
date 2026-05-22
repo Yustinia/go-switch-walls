@@ -1,4 +1,5 @@
 entryPoint := "./cmd"
+exeName := "gsw"
 
 # list recipes
 default:
@@ -8,7 +9,10 @@ run:
     go run {{ entryPoint }}
 
 build:
-    go build -o "gsw" {{ entryPoint }}
+    go build -o {{ exeName }} {{ entryPoint }}
 
 clean:
-    rm -rv "gsw"
+    rm -rv {{ exeName }}
+
+install: build
+    mv -v {{ exeName }}
