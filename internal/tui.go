@@ -135,9 +135,8 @@ func makeStyle() Styles {
 	}
 }
 
-func (m model) View() tea.View {
+func (m model) makeWallList() string {
 	var b strings.Builder
-	styles := makeStyle()
 	page := m.currentPage()
 
 	for index, wall := range page {
@@ -148,8 +147,11 @@ func (m model) View() tea.View {
 
 		fmt.Fprintf(&b, "%s %s\n", cursor, wall)
 	}
-	curPageWall := b.String()
-	b.Reset()
+	return b.String()
+}
+
+func (m model) makeSchemeList() string {
+	var b strings.Builder
 
 	for index, scheme := range matugenSchemes {
 		cursor := " "
@@ -159,19 +161,27 @@ func (m model) View() tea.View {
 
 		fmt.Fprintf(&b, "%s %s\n", cursor, scheme)
 	}
-	schemeSel := b.String()
-	b.Reset()
+	return b.String()
+}
 
+func (m model) setColorMode() string {
 	colorStr := "dark"
 	if m.color == dark {
-		colorStr = "light"
-	} else {
 		colorStr = "dark"
+	} else {
+		colorStr = "light"
 	}
-	bottomRow := fmt.Sprintf("[S] Mode: %s", colorStr)
+	return fmt.Sprintf("[S] Mode: %s", colorStr)
+}
 
-	leftCol := styles.Left.Render(curPageWall)
-	rightCol := styles.Right.Render(lipgloss.JoinVertical(lipgloss.Left, styles.RightTopRow.Render(schemeSel), bottomRow))
+func (m model) View() tea.View {
+	styles := makeStyle()
+	wallList := m.makeWallList()
+	schemeList := m.makeSchemeList()
+	colorState := m.setColorMode()
+
+	leftCol := styles.Left.Render(wallList)
+	rightCol := styles.Right.Render(lipgloss.JoinVertical(lipgloss.Left, styles.RightTopRow.Render(schemeList), colorState))
 
 	render := lipgloss.JoinHorizontal(lipgloss.Left, leftCol, rightCol)
 	return tea.NewView(render)
