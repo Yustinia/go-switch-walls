@@ -126,13 +126,15 @@ type Styles struct {
 	Right lipgloss.Style
 
 	RightTopRow lipgloss.Style
+	RightBotRow lipgloss.Style
 }
 
 func makeStyle() Styles {
 	return Styles{
-		Left:        lipgloss.NewStyle().Width(80),
+		Left:        lipgloss.NewStyle().Width(80).Border(lipgloss.RoundedBorder()),
 		Right:       lipgloss.NewStyle().Width(100),
-		RightTopRow: lipgloss.NewStyle().Height(10),
+		RightTopRow: lipgloss.NewStyle().Height(10).Border(lipgloss.RoundedBorder()),
+		RightBotRow: lipgloss.NewStyle().Border(lipgloss.RoundedBorder()),
 	}
 }
 
@@ -188,7 +190,7 @@ func (m model) View() tea.View {
 	colorStr := viewColorMode(colorState)
 
 	leftCol := styles.Left.Render(wallList)
-	rightCol := styles.Right.Render(lipgloss.JoinVertical(lipgloss.Left, styles.RightTopRow.Render(schemeList), colorStr))
+	rightCol := styles.Right.Render(lipgloss.JoinVertical(lipgloss.Left, styles.RightTopRow.Render(schemeList), styles.RightBotRow.Render(colorStr)))
 
 	render := lipgloss.JoinHorizontal(lipgloss.Left, leftCol, rightCol)
 	return tea.NewView(render)
