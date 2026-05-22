@@ -99,7 +99,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			selWall := m.currentPage()[m.wallCursor]
 			selScheme := matugenSchemes[m.schemeCursor]
-			err = applyWallpaper(selWall, selScheme)
+			selMode := m.setColorMode()
+			err = applyWallpaper(selWall, selScheme, selMode)
 
 			if err != nil {
 				fmt.Println(err)
@@ -171,6 +172,11 @@ func (m model) setColorMode() string {
 	} else {
 		colorStr = "light"
 	}
+
+	return colorStr
+}
+
+func viewColorMode(colorStr string) string {
 	return fmt.Sprintf("[S] Mode: %s", colorStr)
 }
 
@@ -179,9 +185,10 @@ func (m model) View() tea.View {
 	wallList := m.makeWallList()
 	schemeList := m.makeSchemeList()
 	colorState := m.setColorMode()
+	colorStr := viewColorMode(colorState)
 
 	leftCol := styles.Left.Render(wallList)
-	rightCol := styles.Right.Render(lipgloss.JoinVertical(lipgloss.Left, styles.RightTopRow.Render(schemeList), colorState))
+	rightCol := styles.Right.Render(lipgloss.JoinVertical(lipgloss.Left, styles.RightTopRow.Render(schemeList), colorStr))
 
 	render := lipgloss.JoinHorizontal(lipgloss.Left, leftCol, rightCol)
 	return tea.NewView(render)

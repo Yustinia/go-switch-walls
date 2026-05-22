@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 )
 
-func applyWallpaper(wall string, scheme string) error {
+func applyWallpaper(wall string, scheme string, mode string) error {
 	matugenFlags := []string{
-		"image", wall, "-t", scheme, "-m", "dark", "--contrast", "0.1", "--source-color-index", "0",
+		"image", wall, "-t", scheme, "-m", mode, "--contrast", "0.1", "--source-color-index", "0",
 	}
 	awwwFlags := []string{
 		"img", wall, "--transition-type", "simple", "--transition-step", "2", "--transition-fps", "60",
