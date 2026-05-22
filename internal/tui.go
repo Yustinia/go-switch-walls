@@ -11,7 +11,12 @@ import (
 const pageSize int = 20
 
 type state int
+type colorMode int
 
+const (
+	dark colorMode = iota
+	light
+)
 const (
 	leftFoc state = iota
 	rightFoc
@@ -27,6 +32,7 @@ type model struct {
 	wallCursor   int
 	schemeCursor int
 	curState     state
+	color        colorMode
 }
 
 func (m model) currentPage() []string {
@@ -101,6 +107,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "tab":
 			m.curState = (m.curState + 1) % 2
+
+		case "s":
+			if m.color == dark {
+				m.color = light
+			} else {
+				m.color = dark
+			}
 		}
 	}
 
@@ -110,12 +123,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 type Styles struct {
 	Left  lipgloss.Style
 	Right lipgloss.Style
+
+	RightTopRow lipgloss.Style
 }
 
 func makeStyle() Styles {
 	return Styles{
-		Left:  lipgloss.NewStyle().Width(80),
-		Right: lipgloss.NewStyle().Width(100),
+		Left:        lipgloss.NewStyle().Width(80),
+		Right:       lipgloss.NewStyle().Width(100),
+		RightTopRow: lipgloss.NewStyle().Height(10),
 	}
 }
 
@@ -146,8 +162,16 @@ func (m model) View() tea.View {
 	schemeSel := b.String()
 	b.Reset()
 
+	colorStr := "dark"
+	if m.color == dark {
+		colorStr = "light"
+	} else {
+		colorStr = "dark"
+	}
+	bottomRow := fmt.Sprintf("[S] Mode: %s", colorStr)
+
 	leftCol := styles.Left.Render(curPageWall)
-	rightCol := styles.Right.Render(schemeSel)
+	rightCol := styles.Right.Render(lipgloss.JoinVertical(lipgloss.Left, styles.RightTopRow.Render(schemeSel), bottomRow))
 
 	render := lipgloss.JoinHorizontal(lipgloss.Left, leftCol, rightCol)
 	return tea.NewView(render)
