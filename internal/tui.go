@@ -201,5 +201,8 @@ func (m model) View() tea.View {
 	rightCol := styles.Right.Render(lipgloss.JoinVertical(lipgloss.Left, styles.RightTopRow.Render(schemeList), styles.RightBotRow.Render(colorStr)))
 
 	render := lipgloss.JoinHorizontal(lipgloss.Left, leftCol, rightCol)
-	return tea.NewView(render)
+	viewer := tea.NewView(render)
+	viewer.AltScreen = true
+
+	return viewer
 }
