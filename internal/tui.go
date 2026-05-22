@@ -33,6 +33,8 @@ type model struct {
 	schemeCursor int
 	curState     state
 	color        colorMode
+	width        int
+	height       int
 }
 
 func (m model) currentPage() []string {
@@ -116,6 +118,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.color = dark
 			}
 		}
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
 	}
 
 	return m, nil
@@ -129,12 +134,15 @@ type Styles struct {
 	RightBotRow lipgloss.Style
 }
 
-func makeStyle() Styles {
+func makeStyle(totalWidth int) Styles {
+	leftWidth := 80
+	rightWidth := totalWidth - leftWidth
+
 	return Styles{
-		Left:        lipgloss.NewStyle().Width(80).Border(lipgloss.RoundedBorder()),
-		Right:       lipgloss.NewStyle().Width(100),
-		RightTopRow: lipgloss.NewStyle().Height(10).Border(lipgloss.RoundedBorder()),
-		RightBotRow: lipgloss.NewStyle().Border(lipgloss.RoundedBorder()),
+		Left:        lipgloss.NewStyle().Width(leftWidth).Border(lipgloss.RoundedBorder()),
+		Right:       lipgloss.NewStyle().Width(rightWidth),
+		RightTopRow: lipgloss.NewStyle().Width(rightWidth).Border(lipgloss.RoundedBorder()),
+		RightBotRow: lipgloss.NewStyle().Width(rightWidth).Border(lipgloss.RoundedBorder()),
 	}
 }
 
@@ -183,7 +191,7 @@ func viewColorMode(colorStr string) string {
 }
 
 func (m model) View() tea.View {
-	styles := makeStyle()
+	styles := makeStyle(m.width)
 	wallList := m.makeWallList()
 	schemeList := m.makeSchemeList()
 	colorState := m.setColorMode()
