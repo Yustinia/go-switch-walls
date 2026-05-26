@@ -15,4 +15,4 @@ clean:
     rm -rv {{ exeName }}
 
 install: build
-    mv -v {{ exeName }}
+    mv -v {{ exeName }} ~/.local/bin/{{ exeName }}
